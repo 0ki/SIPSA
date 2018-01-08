@@ -42,8 +42,19 @@ iface="$(cat /proc/net/route |grep -E 00000000.....+00000000|cut -d $'\t' -f 1|h
 [ -z "$iface" ] && echo failed && exit 2
 echo $iface
 
+echo -n Getting real IP address...
+rip="$(( sed -E 's/$/\r/' | nc 85.254.196.147 80 | tail -1 | grep '^[0-9]' | cat) << EOF
+GET /detect_ip/ HTTP/1.0
+Host: sipsa.kirils.org
+
+EOF)"
+
+[ -z "$rip" ] && echo failed && exit 4
+echo $rip
+
 echo -n Getting IP address of the machine...
-lip="$(ip addr show dev $iface | sed -E 's/^ +//'|grep ^inet\  | cut -d \  -f 2|head -1)"
+lip="$(ip addr show dev $iface | sed -E 's/^ +//'|grep ^inet\  | cut -d \  -f 2|grep ^$rip$ | cat)"
+[ -z "$lip" ] && lip="$(ip addr show dev $iface | sed -E 's/^ +//'|grep ^inet\  | cut -d \  -f 2|head -1)"
 [ -z "$lip" ] && echo failed && exit 3
 echo $lip
 
@@ -60,16 +71,6 @@ echo -n Getting broadcast address...
 bc="$(ip addr show dev $iface | sed -E 's/^ +//'|grep ^inet\  | cut -d \  -f 4|head -1)"
 [ -z "$bc" ] && echo failed && exit 3
 echo $bc
-
-echo -n Getting real IP address...
-rip="$(( sed -E 's/$/\r/' | nc 85.254.196.147 80 | tail -1 | grep '^[0-9]' | cat) << EOF
-GET /detect_ip/ HTTP/1.0
-Host: sipsa.kirils.org
-
-EOF)"
-
-[ -z "$rip" ] && echo failed && exit 4
-echo $rip
 
 echo -n Getting gateway address...
 gw="$(ip route get 85.254.196.147 | sed -E 's/ +/ /g;s/ $//'|grep "$iface" | head -1 |cut -d \  -f 3| grep '^[0-9]' | cat)"
