@@ -10,7 +10,7 @@ set -e
 
 [ ! -r sipsa_test.c ] && echo source code not found in currect directory && exit 1
 
-echo This is SIPSA research tool version 20180101.
+echo This is SIPSA research tool version 20180102.
 echo
 echo This tool will send less than 100 small packets to sipsa.kirils.org.
 echo Various IP address data will be collected.
@@ -72,7 +72,7 @@ EOF)"
 echo $rip
 
 echo -n Getting gateway address...
-gw="$(ip route get 85.254.196.147 | sed -E 's/ +/ /g;s/ $//'|grep "$iface" | head -1 |cut -d \  -f 3)"
+gw="$(ip route get 85.254.196.147 | sed -E 's/ +/ /g;s/ $//'|grep "$iface" | head -1 |cut -d \  -f 3| grep '^[0-9]' | cat)"
 [ -z "$gw" ] && echo failed && exit 5
 echo $gw
 
@@ -172,7 +172,7 @@ $sudo ./sipsa_test "$iface" "$tmpip" "$lip-$tmpip-Cp$failmode"
 iplst="$iplst;$tmpip"
 
 echo done.
-$sudo ./sipsa_test "$iface" "$lip" "REPORT:20180101:$lip-$iface$failmode$iplst"
+$sudo ./sipsa_test "$iface" "$lip" "REPORT:20180102:$lip-$iface$failmode$iplst"
 
 
 echo Thank you for contributing to SIPSA research.

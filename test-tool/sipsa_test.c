@@ -68,7 +68,7 @@ main (int argc, char **argv)
   packet = allocate_ustrmem (IP_MAXPACKET);
   interface = allocate_strmem (strlen(argv[1]));
   target = allocate_strmem (40);
-  src_ip = allocate_strmem (strlen(argv[2]));
+  src_ip = allocate_strmem (INET_ADDRSTRLEN);
   dst_ip = allocate_strmem (INET_ADDRSTRLEN);
   ip_flags = allocate_intmem (4);
 
