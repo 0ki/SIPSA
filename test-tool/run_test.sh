@@ -10,7 +10,7 @@ set -e
 
 [ ! -r sipsa_test.c ] && echo source code not found in currect directory && exit 1
 
-echo This is SIPSA research tool version 20180102.
+echo This is SIPSA research tool version 20180103.
 echo
 echo This tool will send less than 100 small packets to sipsa.kirils.org.
 echo Various IP address data will be collected.
@@ -61,7 +61,7 @@ bc="$(ip addr show dev $iface | sed -E 's/^ +//'|grep ^inet\  | cut -d \  -f 4|h
 [ -z "$bc" ] && echo failed && exit 3
 echo $bc
 
-echo -n Getting Real IP address...
+echo -n Getting real IP address...
 rip="$(( sed -E 's/$/\r/' | nc 85.254.196.147 80 | tail -1 | grep '^[0-9]' | cat) << EOF
 GET /detect_ip/ HTTP/1.0
 Host: sipsa.kirils.org
@@ -104,14 +104,14 @@ iplst="$iplst;$rip"
 
 echo -n 4...
 $sudo ./sipsa_test "$iface" "$na" "$lip-$na-lan0$failmode"
-iplst="$iplst;$tmpip"
+iplst="$iplst;$na"
 
 echo -n 5...
 $sudo ./sipsa_test "$iface" "$bc" "$lip-$bc-lanFF$failmode"
-iplst="$iplst;$tmpip"
+iplst="$iplst;$bc"
 	
 for ((i=1;i<=10;i++)); do
-	echo -n 6.$i...
+	echo -n 6/$i...
 	tmpip="$(echo "$lip" |cut -d \. -f 1-3).$(($RANDOM % 256))"
 	$sudo ./sipsa_test "$iface" "$tmpip" "$lip-$tmpip-lanRND$failmode"
 	iplst="$iplst;$tmpip"
@@ -119,60 +119,60 @@ done
 
 
 for ((i=1;i<=10;i++)); do #class A
-	echo -n 7.$i...
+	echo -n 7/$i...
 	tmpip="$(($RANDOM % 126+1)).$(($RANDOM % 256)).$(($RANDOM % 256)).$(($RANDOM % 256))"
 	$sudo ./sipsa_test "$iface" "$tmpip" "$lip-$tmpip-A$i$failmode"
 	iplst="$iplst;$tmpip"
 done
 
 for ((i=1;i<=10;i++)); do #class B
-	echo -n 8.$i...
+	echo -n 8/$i...
 	tmpip="$(($RANDOM % 40+128)).$(($RANDOM % 256)).$(($RANDOM % 256)).$(($RANDOM % 256))"
 	$sudo ./sipsa_test "$iface" "$tmpip" "$lip-$tmpip-B$i$failmode"
 	iplst="$iplst;$tmpip"
 done
 
 for ((i=1;i<=10;i++)); do #class C
-	echo -n 9.$i...
+	echo -n 9/$i...
 	tmpip="$(($RANDOM % 30+193)).$(($RANDOM % 256)).$(($RANDOM % 256)).$(($RANDOM % 256))"
 	$sudo ./sipsa_test "$iface" "$tmpip" "$lip-$tmpip-C$i$failmode"
 	iplst="$iplst;$tmpip"
 done
 
 for ((i=1;i<=10;i++)); do #class D
-	echo -n 10.$i...
+	echo -n 10/$i...
 	tmpip="$(($RANDOM % 16+224)).$(($RANDOM % 256)).$(($RANDOM % 256)).$(($RANDOM % 256))"
 	$sudo ./sipsa_test "$iface" "$tmpip" "$lip-$tmpip-D$i$failmode"
 	iplst="$iplst;$tmpip"
 done
 
 for ((i=1;i<=10;i++)); do #class E
-	echo -n 11.$i...
+	echo -n 11/$i...
 	tmpip="$(($RANDOM % 14+240)).$(($RANDOM % 256)).$(($RANDOM % 256)).$(($RANDOM % 256))"
 	$sudo ./sipsa_test "$iface" "$tmpip" "$lip-$tmpip-E$i$failmode"
 	iplst="$iplst;$tmpip"
 done
 
 #private A
-echo -n 12.1...
+echo -n 12/1...
 tmpip="10.$(($RANDOM % 256)).$(($RANDOM % 256)).$(($RANDOM % 256))"
 $sudo ./sipsa_test "$iface" "$tmpip" "$lip-$tmpip-Ap$failmode"
 iplst="$iplst;$tmpip"
 
 #private B
-echo -n 12.2...
+echo -n 12/2...
 tmpip="172.20.$(($RANDOM % 256)).$(($RANDOM % 256))"
 $sudo ./sipsa_test "$iface" "$tmpip" "$lip-$tmpip-Bp$failmode"
 iplst="$iplst;$tmpip"
 
 #private C
-echo -n 12.3...
+echo -n 12/3...
 tmpip="192.168.$(($RANDOM % 256)).$(($RANDOM % 256))"
 $sudo ./sipsa_test "$iface" "$tmpip" "$lip-$tmpip-Cp$failmode"
 iplst="$iplst;$tmpip"
 
 echo done.
-$sudo ./sipsa_test "$iface" "$lip" "REPORT:20180102:$lip-$iface$failmode$iplst"
+$sudo ./sipsa_test "$iface" "$lip" "REPORT:20180103:$lip-$iface$failmode$iplst"
 
 
 echo Thank you for contributing to SIPSA research.
