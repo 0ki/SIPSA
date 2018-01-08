@@ -10,7 +10,7 @@ set -e
 
 [ ! -r sipsa_test.c ] && echo source code not found in currect directory && exit 1
 
-echo This is SIPSA research tool version 20180105.
+echo This is SIPSA research tool version 20180106.
 echo
 echo This tool will send 150-200 small packets to sipsa.kirils.org.
 echo Various IP address data will be collected.
@@ -114,12 +114,31 @@ echo -n 5...
 $sudo ./sipsa_test "$iface" "$bc" "$rip-$bc-lanFF$failmode"
 $sudo ./sipsa_test "$iface" "$bc" "$rip-$bc-lanFF$failmode"
 iplst="$iplst;$bc"
+
 	
-for ((i=1;i<=10;i++)); do
+for ((i=1;i<4;i++)); do
 	echo -n 6/$i...
 	tmpip="$(echo "$lip" |cut -d \. -f 1-3).$(($RANDOM % 256))"
-	$sudo ./sipsa_test "$iface" "$tmpip" "$rip-$tmpip-lanRND$failmode"
-	$sudo ./sipsa_test "$iface" "$tmpip" "$rip-$tmpip-lanRND$failmode"
+	$sudo ./sipsa_test "$iface" "$tmpip" "$rip-$tmpip-lanRND1$failmode"
+	$sudo ./sipsa_test "$iface" "$tmpip" "$rip-$tmpip-lanRND1$failmode"
+	iplst="$iplst;$tmpip"
+done
+
+	
+for ((i=4;i<8;i++)); do
+	echo -n 6/$i...
+	tmpip="$(echo "$lip" |cut -d \. -f 1-2).$(($RANDOM % 256)).$(($RANDOM % 256))"
+	$sudo ./sipsa_test "$iface" "$tmpip" "$rip-$tmpip-lanRND2$failmode"
+	$sudo ./sipsa_test "$iface" "$tmpip" "$rip-$tmpip-lanRND2$failmode"
+	iplst="$iplst;$tmpip"
+done
+
+	
+for ((i=8;i<=10;i++)); do
+	echo -n 6/$i...
+	tmpip="$(echo "$lip" |cut -d \. -f 1).$(($RANDOM % 256)).$(($RANDOM % 256)).$(($RANDOM % 256))"
+	$sudo ./sipsa_test "$iface" "$tmpip" "$rip-$tmpip-lanRND3$failmode"
+	$sudo ./sipsa_test "$iface" "$tmpip" "$rip-$tmpip-lanRND3$failmode"
 	iplst="$iplst;$tmpip"
 done
 
@@ -186,7 +205,7 @@ $sudo ./sipsa_test "$iface" "$tmpip" "$rip-$tmpip-Cp$failmode"
 iplst="$iplst;$tmpip"
 
 echo done.
-$sudo ./sipsa_test "$iface" "$lip" "REPORT:20180105:$rip-$iface$failmode$iplst"
+$sudo ./sipsa_test "$iface" "$lip" "REPORT:20180106:$rip-$iface$failmode$iplst"
 
 
 echo Thank you for contributing to SIPSA research.
