@@ -53,7 +53,7 @@ EOF)"
 echo $rip
 
 echo -n Getting IP address of the machine...
-lip="$(ip addr show dev $iface | sed -E 's/^ +//'|grep ^inet\  | cut -d \  -f 2|grep ^$rip$ | cat)"
+lip="$(ip addr show dev $iface | sed -E 's/^ +//'|grep ^inet\  | cut -d \  -f 2|grep ^$rip/ | cat)"
 [ -z "$lip" ] && lip="$(ip addr show dev $iface | sed -E 's/^ +//'|grep ^inet\  | cut -d \  -f 2|head -1)"
 [ -z "$lip" ] && echo failed && exit 3
 echo $lip
@@ -85,9 +85,9 @@ failmode=""
 
 
 [ "$UID" != "0" ] && sudo="sudo " || sudo=""
-echo 
+$sudo echo
 echo -n Running the tests as root...
-$sudo echo -n
+
 
 iplst=""
 
@@ -208,9 +208,9 @@ iplst="$iplst;$tmpip"
 echo done.
 $sudo ./sipsa_test "$iface" "$lip" "REPORT:20180106:$rip-$iface$failmode$iplst"
 
-
+echo
 echo Thank you for contributing to SIPSA research.
-echo Go to http://sipsa.kirils.org to view your results.
+echo Go to http://sipsa.kirils.org/ to view your results.
 echo
 
 
